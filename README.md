@@ -1,6 +1,7 @@
 # 在我的路由器里安装ipxe用来启动网络winpe系统
 ## 路由器是k3，系统为openwrt
 
+## 使用[ipxe](https://ipxe.org)方案编译，配置。
 ## 说明：
 undionly.kpxe与ipxe.efi都是新编译的。两种都是加载boot.ipxe，再由boot.ipxe判断是传统启动，还是efi启动。再加载menu.ipxe或uefi.ipxe
 
