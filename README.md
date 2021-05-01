@@ -4,7 +4,7 @@
 ## 说明：
 undionly.kpxe与ipxe.efi都是新编译的。两种都是加载boot.ipxe，再由boot.ipxe判断是传统启动，还是efi启动。再加载menu.ipxe或uefi.ipxe
 
-路由器插上U盘。分区fdisk。格式化 mkfs.ext4 /dev/sda1
+路由器插上U盘。分区fdisk /dev/sda。格式化 mkfs.ext4 /dev/sda1
 
 我用的是ext4文件系统。其他文件系统也可以。
 
