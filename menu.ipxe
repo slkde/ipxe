@@ -1,0 +1,94 @@
+#!ipxe
+
+# Some menu defaults
+# set menu-timeout 0 if no client-specific settings found
+isset ${menu-timeout} || set menu-timeout 0
+set submenu-timeout ${menu-timeout}
+isset ${menu-default} || set menu-default exit
+
+###################### MAIN MENU --${platform}--${ip} ##########################
+
+:start
+menu iPXE boot menu for ${next-server}
+item --gap --             ------------------------- Tools and utilities ----------------------------
+item --key d menu-diag    Memtest-Tools and Win10pe_for_OS_installation
+item --gap --             ------------------------- Advanced options -------------------------------
+item --key c config       Configure settings
+item shell                Drop to iPXE shell
+item reboot               Reboot computer
+item
+item --key x exit         Exit iPXE and continue BIOS boot
+choose --timeout ${menu-timeout} --default ${menu-default} selected || goto cancel
+set menu-timeout 0
+goto ${selected}
+
+:cancel
+echo You cancelled the menu, dropping you to a shell
+
+:shell
+echo Type 'exit' to get the back to the menu
+shell
+set menu-timeout 0
+set submenu-timeout 0
+goto start
+
+:failed
+echo Booting failed, dropping to shell
+goto shell
+
+:reboot
+reboot
+
+:exit
+exit
+
+:config
+config
+goto start
+
+:back
+set submenu-timeout 0
+clear submenu-default
+goto start
+
+###################### SYSTEM TOOL MENU #############################
+
+:menu-diag
+menu Memtest-Tools and Win10pe_for_OS_installation
+item memtest	Memtest-Tools
+item win8pe  	Win8PE
+item win10pe	Win10PE
+item win10pe64	Win10PE64
+item
+item --key 0x08 back Back to top menu...
+iseq ${menu-default} menu-diag && isset ${submenu-default} && goto menu-diag-timed ||
+choose selected && goto ${selected} || goto start
+:menu-diag-timed
+choose --timeout ${submenu-timeout} --default ${submenu-default} selected && goto ${selected} || goto start
+
+:memtest
+initrd ${http-url}iso/mt531b.iso
+chain memdisk iso raw || goto failed
+goto start
+
+:win8pe
+initrd ${http-url}iso/Win8PE.iso
+chain memdisk iso raw || goto failed
+goto start
+
+:win10pe
+initrd ${http-url}iso/Win10PE.iso
+chain memdisk iso raw || goto failed
+goto start
+
+:win10pe64
+initrd ${http-url}iso/Win10X64.iso
+chain memdisk iso raw || goto failed
+goto start
+
+# If everything failed, give the user some options
+echo Boot from ${http-url}iso failed
+prompt --key 0x197e --timeout 30000 Press F12 to investigate || exit
+shell
+
+###################### MENU END #############################

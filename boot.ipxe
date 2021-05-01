@@ -1,0 +1,35 @@
+#!ipxe
+
+
+# 测试是否存在ip，否则dhcp自动获取
+isset ${ip} || dhcp
+
+# 测试是否存在next-server服务器，否则指定next-server为192.168.1.1
+isset ${next-server} || set next-server 192.168.1.1
+
+# 变量
+set tftp-url tftp://${next-server}/
+set http-url http://${next-server}/ipxe/
+
+# nfs共享
+# set nfs-server nfs://${next-server}
+
+# 变量
+# set nas_ip ${next-server}
+
+# sanhook --drive 0x80 uri # to attach iSCSI target to drive to boot from installer ISO with sanboot
+# sanboot --drive 0x81 uri # to boot installer.iso
+
+# 判断启动方式
+iseq ${platform} efi && goto uefi || iseq ${platform} pcbios && goto legacy
+
+
+:uefi
+    chain --autofree ${http-url}uefi.ipxe
+
+
+:legacy
+    chain --autofree ${http-url}menu.ipxe
+
+
+chain ${http-url}menu.ipxe
